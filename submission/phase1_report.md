@@ -78,7 +78,7 @@ hundred. For each of the three platforms, answer concretely:
 to the second question.)
 
 <!--answer:scaling_behaviour-->
-The VM does not create anything automatically as load increases; all requests are handled by the single e2-micro VM, so its CPU and memory are the practical limit. Cloud Run automatically creates additional container instances to handle concurrent requests, but I limited it with --max-instances=3. The Cloud Function also scales automatically by creating additional function instances as demand increases. Unlike the fixed VM, the two serverless platforms manage instance creation and scaling automatically, subject to their configured platform limits.
+The VM does not create additional instances automatically as load increases. All requests are handled by the single e2-micro VM, so its CPU and memory are the practical limit. Cloud Run automatically creates additional container instances to handle concurrent requests, but I limited it with --max-instances=3. The Cloud Function also scales automatically by creating additional function instances as demand increases. Unlike the fixed VM, the two serverless platforms manage instance creation and scaling automatically, subject to their configured platform limits.
 <!--/answer-->
 
 **Deployment effort.** What did you have to build, configure and maintain to get each of the
