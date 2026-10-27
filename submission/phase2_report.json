@@ -1,0 +1,30 @@
+{
+  "phase": "2",
+  "environment": {
+    "colab": true
+  },
+  "attention": {
+    "naive_ms": 248.161,
+    "vectorized_ms": 1.071,
+    "speedup": 231.71
+  },
+  "threads": {
+    "1": 2499.007,
+    "2": 2202.611,
+    "4": 2329.92,
+    "8": 2380.158
+  },
+  "devices": {
+    "cpu_ms": 433048.3,
+    "gpu_ms": 12854.3
+  },
+  "training": {
+    "steps": 2000,
+    "final_loss": 1.5019,
+    "param_count": 4935680
+  },
+  "sample": "\nUnlemet outhes.\n\nFirst Claren:\nBesome you, fell, there'ls to confect, here yes!\n\nPROSPERO:\nHarl my own Signorion, I warrant not duke it;\nIn all to any the valw, that Emblow\nWhat and do, and sill sleep",
+  "model": {
+    "gcs_url": "https://storage.googleapis.com/eurecom-gpt-eurecomgpt/model.safetensors"
+  }
+}
