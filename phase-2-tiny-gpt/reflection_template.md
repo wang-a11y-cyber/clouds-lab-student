@@ -20,17 +20,17 @@ retype from memory; they are checked against it.
 
 | | Value |
 |---|---|
-| Naive attention, ms (`attention.naive_ms`) | <!--answer:attn_naive_ms-->TODO<!--/answer--> |
-| Vectorized attention, ms (`attention.vectorized_ms`) | <!--answer:attn_vectorized_ms-->TODO<!--/answer--> |
-| CPU training, ms for 100 steps (`devices.cpu_ms`) | <!--answer:cpu_ms-->TODO<!--/answer--> |
-| GPU training, ms for 100 steps (`devices.gpu_ms`) | <!--answer:gpu_ms-->TODO<!--/answer--> |
-| Final training loss (`training.final_loss`) | <!--answer:final_loss-->TODO<!--/answer--> |
+| Naive attention, ms (`attention.naive_ms`) | <!--answer:attn_naive_ms-->248.161<!--/answer--> |
+| Vectorized attention, ms (`attention.vectorized_ms`) | <!--answer:attn_vectorized_ms-->1.071<!--/answer--> |
+| CPU training, ms for 100 steps (`devices.cpu_ms`) | <!--answer:cpu_ms-->433048.3<!--/answer--> |
+| GPU training, ms for 100 steps (`devices.gpu_ms`) | <!--answer:gpu_ms-->12854.3<!--/answer--> |
+| Final training loss (`training.final_loss`) | <!--answer:final_loss-->1.5019<!--/answer--> |
 
 **The thread sweep.** Give your four timings from `threads` — 1, 2, 4 and 8 threads — and say
 which count was fastest. (verbatim: the numbers, in order)
 
 <!--answer:thread_sweep-->
-TODO
+1 thread: 2499.007 ms, 2 threads: 2202.611 ms, 4 threads: 2329.92 ms, 8 threads: 2380.158 ms. The fastest configuration was 2 threads.
 <!--/answer-->
 
 ---
@@ -43,7 +43,7 @@ and what the vectorized one does differently — in terms of the machine, not th
 (~70 words)
 
 <!--answer:vectorization_why-->
-TODO
+The naive implementation spends much of its time executing nested loops and individual operations through the Python interpreter. The vectorized implementation expresses the same arithmetic as array and matrix operations, which allowing NumPy and optimized OpenBLAS routines to perform the work in compiled code and exploit SIMD instructions, such as AVX. This reduced the attention time from 248.161 ms to 1.071 ms in my experiment.
 <!--/answer-->
 
 **Where the thread curve flattens, and why.** Using your sweep: more threads stopped helping —
@@ -51,7 +51,7 @@ or started hurting — at some point. Say where, and give the reason. Your Colab
 count is part of the answer; so is what the threads have to coordinate on. (~80 words)
 
 <!--answer:threading_plateau-->
-TODO
+The best result was at 2 threads (2202.611 ms), compared with 2499.007 ms for one thread. Increasing the count to 4 and 8 threads made the step slower, which are at 2329.92 ms and 2380.158 ms respectively. The Colab runtime has limited CPU resources, thus adding software threads does not necessarily add physical execution capacity. Extra threads must also coordinate and compete for such as CPU time, caches, memory bandwidth, and shared data, thus their overhead eventually exceeds the benefit of additional parallelism.
 <!--/answer-->
 
 **What made the GPU faster.** The model, the data and the step count were identical; only the
@@ -59,7 +59,7 @@ device changed. Say what about a transformer training step suits a GPU, and name
 that would *not* see this speed-up. (~70 words)
 
 <!--answer:gpu_why-->
-TODO
+Transformer training consists largely of highly parallel matrix multiplications and other tensor operations. A GPU can thus execute many such operations concurrently across a large number of processing units, which suits this workload very well. In my run, 100 steps fell from 433048.3 ms on the CPU to 12854.3 ms on the T4. However, in one case that a small sequential workload with little independent computation will not obtain the same GPU speed-up.
 <!--/answer-->
 
 ---
@@ -72,12 +72,12 @@ you do not have, coordination that costs more than it saves, data that has to mo
 which one bound each experiment. One concrete number from section 1 per claim. (~150 words)
 
 <!--answer:parallelism_limit-->
-TODO
+The experiments show that parallelism stops helping for different reasons at different layers. Vectorization removed Python-loop overhead and exposed data-parallel arithmetic to optimized machine code, where attention fell from 248.161 ms to 1.071 ms, thus the naive implementation was primarily limited by how the work was expressed and executed. CPU threading then encountered a hardware and coordination limit. Two threads were fastest at 2202.611 ms, while four threads increased the time to 2329.92 ms. Because additional threads had to compete for such as limited CPU execution resources, caches and memory bandwidth, while paying synchronization and scheduling costs. The GPU exposed much more parallel hardware for the transformer's matrix operations computation, reducing 100 training steps from 433048.3 ms on CPU to 12854.3 ms. However, the GPU acceleration is also bounded by such as sequential work, available GPU resources, synchronization, and the cost of moving data between host and device. Parallelism therefore helps only while the useful concurrent work outweighs these overheads and resource limits.
 <!--/answer-->
 
 **What you would measure next.** One experiment this phase did not run that would sharpen the
 answer, and what result would change your mind. (~50 words)
 
 <!--answer:next_experiment-->
-TODO
+I will repeat the threading sweep on machines with different numbers of CPU cores, while keeping the model and workload fixed. If the machines with more cores continued improving beyond the 2-thread minimum observed here, it would support the conclusion that it was primarily caused by limited CPU hardware, rather than an inherent limit of the workload.
 <!--/answer-->
